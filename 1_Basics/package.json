@@ -1,0 +1,24 @@
+{
+  "name": "typescript",
+  "version": "1.0.0",
+  "description": "How to use TypeScript",
+  "main": "app.js",
+  "scripts": {
+    "start": "lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Roger-Takeshita/TypeScript.git"
+  },
+  "author": "Roger Takeshita",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Roger-Takeshita/TypeScript/issues"
+  },
+  
+  "homepage": "https://github.com/Roger-Takeshita/TypeScript#readme",
+  "dependencies": {
+    "lite-server": "^2.5.4"
+  }
+}
