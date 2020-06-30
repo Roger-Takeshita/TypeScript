@@ -1,13 +1,27 @@
 <h1 id='summary'>Summary</h1>
 
--   [xxxxxxxxx](#xxxxxxxx)
--   [xxxxxxxxx](#xxxxxxxx)
--   [xxxxxxxxx](#xxxxxxxx)
--   [xxxxxxxxx](#xxxxxxxx)
--   [xxxxxxxxx](#xxxxxxxx)
--   [xxxxxxxxx](#xxxxxxxx)
--   [xxxxxxxxx](#xxxxxxxx)
--   [xxxxxxxxx](#xxxxxxxx)
+-   [TypeScript](#typescript)
+    -   [Package](#package)
+    -   [Generate .js](#generatejs)
+        -   [Single File](#singlefile)
+        -   [Single File Watch Mode](#singlefilewatch)
+        -   [All .ts Files - Project](#allfileswatch)
+            -   [Exclude .ts](#excludets)
+            -   [Include .ts](#includets)
+            -   [Extra Configuration](#extraconfig)
+    -   [Getting Started](#gettingstarted)
+        -   [DOM Error](#domerror1)
+            -   [Error - Option 1](#error1)
+            -   [Error - Option 2](#error2)
+        -   [Functions](#functions)
+            -   [Normal Function](#normalfunction)
+            -   [Arrow Function With Return Value](#arrowfunction)
+            -   [Arrow Function Without Return Value](#arrowfunction1)
+            -   [Function With Different Types of Arguments](#functionargs)
+        -   [Spread Operator](#spread)
+        -   [Destructuring](#destructuring)
+            -   [Object](#object)
+            -   [Array](#array)
 
 <h1 id='typescript'>TypeScript</h1>
 
@@ -178,6 +192,211 @@
       ]
     ```
 
+<h4 id='extraconfig'>Extra Configuration</h4>
+
+-   We can also set extra configuration
+
+    -   In the configuration below, we need to manually add a new field (**noEmitOnError**), by default is set to **false**.
+        -   If set to **true**, TypeScript won't compile the **.ts** file if there is any error
+    -   **sourceMap**, it a good option to debug our `.ts` using Chrome Dev Tools
+
+    ```JSON
+      {
+        "compilerOptions": {
+          /* Visit https://aka.ms/tsconfig.json to read more about this file */
+
+          /* Basic Options */
+          "target": "es6",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
+          "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
+          "lib": [
+            "DOM",
+            "ES6",
+            "DOM.Iterable",
+            "ScriptHost"
+          ],                                        /* Specify library files to be included in the compilation. */
+          "sourceMap": true,                        /* Generates corresponding '.map' file. */
+          "outDir": "./dist",                       /* Redirect output structure to the directory. */
+          "rootDir": "./src",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+          "removeComments": true,                   /* Do not emit comments to output. */
+          "noEmitOnError": true,
+
+          /* Strict Type-Checking Options */
+          "strict": true,                           /* Enable all strict type-checking options. */
+
+          /* Additional Checks */
+          "noUnusedLocals": true,                   /* Report errors on unused locals. */
+          "noUnusedParameters": true,               /* Report errors on unused parameters. */
+          "noImplicitReturns": true,                /* Report error when not all code paths in function return a value. */
+          "noFallthroughCasesInSwitch": true,       /* Report errors for fallthrough cases in switch statement. */
+
+          /* Module Resolution Options */
+          "esModuleInterop": true,                  /* Enables emit interoperability between
+
+          /* Advanced Options */
+          "skipLibCheck": true,                     /* Skip type checking of declaration files. */
+          "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to the same file. */
+        },
+        "exclude": [
+          "analytics.ts"
+        ]
+      }
+    ```
+
 -   Then, after we've created the `tsconfig.json`
     -   we execute `tsc --w` (`--w`, watch mode)
     -   And this command will search for all `.ts` in our project and compile the `.js` version of each file
+
+<h2 id='gettingstarted'>Getting Started</h2>
+
+<h3 id='domerror1'>DOM Error</h3>
+
+[Go Back to Summary](#summary)
+
+<h4 id='error1'>Error - Option 1</h4>
+
+-   The easiest way to handle error from non existing elements in our DOM it to add and `if` statement to check if the element is truthy
+
+    ```TypeScript
+      const button1 = document.querySelector('button');
+      if (button1) {
+          button1.addEventListener('click', () => {
+              console.log('Clicked!');
+          });
+      }
+    ```
+
+<h4 id='error2'>Error - Option 2</h4>
+
+-   Another option is to add a `?` right after the element
+
+    ```TypeScript
+      const button2 = document.querySelector('button');
+      button2?.addEventListener('click', () => {
+          console.log('Clicked!');
+      });
+    ```
+
+<h3 id='functions'>Functions</h3>
+
+[Go Back to Summary](#summary)
+
+<h4 id='normalfunction'>Normal Function</h4>
+
+-   Normal function returning the result to be used in our code
+
+    ```TypeScript
+      function add(a: number, b: number) {
+          return a + b;
+      }
+      console.log(add(3, 5));
+
+      // 8
+    ```
+
+<h4 id='arrowfunction'>Arrow Function With Return Value</h4>
+
+-   Arrow function with default value, returning the result to be used in our code
+
+    ```TypeScript
+      const addDefault = (a: number, b: number = 1) => a + b;
+
+      console.log(addDefault(1));
+
+      // 2
+    ```
+
+    ```TypeScript
+      const birthYear = (age: number) => {
+          return 2020 - age;
+      };
+
+      const year = birthYear(33);
+      printOutput(year);
+
+      // 1987
+    ```
+
+<h4 id='arrowfunction1'>Arrow Function Without Return Value</h4>
+
+-   Arrow function receiving a number or a string, not using the result in our program
+
+    -   If we are not returning anything from a function, it's a good practice to define as **void**
+        -   so if we are using an arrow function we fist have to define the input type that our function can receive
+            -   `printOutput: (a: number | string)`
+        -   Then we have to explicit indicate that this function is not returning anything
+            -   `=> void`
+        -   And the rest is just a normal arrow function
+
+    ```TypeScript
+      const printOutput: (a: number | string) => void = (output) => {
+          console.log(output);
+      };
+    ```
+
+<h4 id='functionargs'>Function With Different Types of Arguments</h4>
+
+[Go Back to Summary](#summary)
+
+-   We can also create a function that accepts `n` types of arguments
+
+    ```TypeScript
+      const concatStr = (a: string, b: string) => a + b;
+
+      printOutput(addDefault(3, 8));
+      printOutput(concatStr('Roger', 'Takeshita'));
+
+      // 11
+      // RogerTakeshita
+    ```
+
+<h3 id='spread'>Spread Operator</h3>
+
+[Go Back to Summary](#summary)
+
+```TypeScript
+  const numbers: number[] = [];
+  const test: number[] = [1, 2, 3, 4, 5, 6];
+
+  numbers.push(...test);
+  console.log(numbers);
+
+  // [1, 2, 3, 4, 5, 6]
+```
+
+<h3 id='destructuring'>Destructuring</h3>
+
+[Go Back to Summary](#summary)
+
+<h4 id='object'>Object</h4>
+
+-   Destructuring an object and assigning a different name from the object
+
+    ```TypeScript
+      const person = {
+          firstName: 'Roger',
+          lastName: 'Takeshita',
+          age: 33,
+      };
+
+      const { firstName: userName, age } = person;
+      console.log(userName, age);
+
+      // Roger 33
+    ```
+
+<h4 id='array'>Array</h4>
+
+-   We can also destructuring an array by position, and the rest of remaining values we could assign to another variable
+
+    ```TypeScript
+      const sports: string[] = ['Hiking', 'Cycling', 'Baseball', 'Basketball'];
+      const [sport1, sport2, ...rest] = sports;
+
+      console.log(sport1);
+      console.log(sport2);
+      console.log(rest);
+
+      // Hiking
+      // Cycling
+      // ["Baseball", "Basketball"]
+    ```
