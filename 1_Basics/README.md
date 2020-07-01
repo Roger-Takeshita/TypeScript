@@ -22,6 +22,12 @@
         -   [Destructuring](#destructuring)
             -   [Object](#object)
             -   [Array](#array)
+        -   [Classes](#classes)
+            -   [Inheritance](#inheritance)
+            -   [Getters and Setters](#getters)
+            -   [Static Methods / Properties](#static)
+            -   [Abstract](#abstract)
+            -   [Private Constructor - Singleton Pattern](#singleton)
 
 <h1 id='typescript'>TypeScript</h1>
 
@@ -399,4 +405,320 @@
       // Hiking
       // Cycling
       // ["Baseball", "Basketball"]
+    ```
+
+<h3 id='classes'>Classes</h3>
+
+[Go Back to Summary](#summary)
+
+-   **Properties**
+    -   **public** properties, where can be accessed anywhere outside of the class
+    -   **private** properties, where can be accessed only inside the class, but not from subclasses - inheritance
+    -   **protected** properties, where cannot be accessed outside of the class, but can be accessed from their subclass - inheritance
+-   **Constructor**
+    -   The constructor immediately instantiate the properties defined inside the constructor, when we invoke a new instance of the class
+    -   With TypeScript we can create a new property, assign in one line:
+        -   `public`, `private`, `protected`
+        -   `readonly` - read mode only, cannot be modified
+        -   assign the `type`
+-   **Methods**
+
+    -   With a method of a class, we can create custom functions for our classes
+    -   But if we need access to certain properties from the constructor to a subclass, we need to assign to the type of **class**, in other words assign **name of the class**
+
+    ```TypeScript
+      class Department {
+          // public publicProperty: string;
+          // private privateProperty: string;
+          protected employees: string[] = [];
+
+          constructor(private readonly id: string, public name: string) {}
+
+          describe(this: Department) {
+              console.log(`Department: ${this.name} (${this.id})`);
+          }
+
+          addEmployee(employee: string) {
+              this.employees.push(employee);
+          }
+
+          printEmployeeInformation() {
+              console.log(this.employees.length);
+              console.log(this.employees);
+          }
+      }
+    ```
+
+<h4 id='inheritance'>Inheritance</h4>
+
+-   We can inherit properties, methods and override methods from the parent class
+
+    -   In a derived class, the **super** keyword represents the parent superclass and must be called before the **this** keyword can be used in the constructor.
+
+    ```TypeScript
+      const it = new ITDepartment('d3', ['Roger']);
+      it.addEmployee('Mike');
+      it.addEmployee('Joy');
+      it.addEmployee('Yumi');
+      it.name = 'New IT';
+      it.describe();
+      it.printEmployeeInformation();
+      console.log(it);
+
+      class AccountingDepartment extends Department {
+          constructor(id: string, private reports: string[]) {
+              super(id, 'Accounting Reports');
+          }
+
+          addEmployee(name: string) {
+              if (name === 'Bob') return;
+              this.employees.push(name);
+          }
+
+          addReport(text: string) {
+              this.reports.push(text);
+          }
+
+          printReports() {
+              console.log(this.reports);
+          }
+      }
+
+      const accDepartment = new AccountingDepartment('d4', []);
+      accDepartment.name = 'New Accounting Department';
+      accDepartment.describe();
+      accDepartment.addEmployee('Bob');
+      accDepartment.addEmployee('Marley');
+      accDepartment.addReport('Report 1');
+      accDepartment.addReport('Report 2');
+      accDepartment.addReport('Report 3');
+      accDepartment.printReports();
+      accDepartment.printEmployeeInformation();
+      console.log(accDepartment);
+    ```
+
+<h4 id='getters'>Getters and Setters</h4>
+
+-   Encapsulating more complex logic to our class, we can use `get` (getter) and `set` (setter) to define a new method that we can access like a property of the class
+
+    ```TypeScript
+      class AccountingDepartment extends Department {
+          private lastReport: string;
+
+          get mostRecentReport() {
+              if (this.lastReport) return this.lastReport;
+              throw new Error('No report found.');
+          }
+
+          set mostRecentReport(value: string) {
+              if (!value) throw new Error('Please pass a valid value');
+              this.addReport(value);
+          }
+
+          constructor(id: string, private reports: string[]) {
+              super(id, 'Accounting Reports');
+              this.lastReport = reports[0];
+          }
+
+          addEmployee(name: string) {
+              if (name === 'Bob') return;
+              this.employees.push(name);
+          }
+
+          addReport(text: string) {
+              this.reports.push(text);
+              this.lastReport = text;
+          }
+
+          printReports() {
+              console.log(this.reports);
+          }
+      }
+
+      const accDepartment = new AccountingDepartment('d4', []);
+      // console.log(accDepartment.mostRecentReport);
+      accDepartment.mostRecentReport = 'Report using setter';
+      accDepartment.name = 'New Accounting Department';
+      accDepartment.describe();
+      accDepartment.addEmployee('Bob');
+      accDepartment.addEmployee('Marley');
+      accDepartment.addReport('Report 1');
+      accDepartment.addReport('Report 2');
+      accDepartment.addReport('Report 3');
+      accDepartment.printReports();
+      accDepartment.printEmployeeInformation();
+      console.log(accDepartment);
+      console.log(accDepartment.mostRecentReport);
+    ```
+
+<h4 id='static'>Static Methods / Properties</h4>
+
+-   Call a method without instantiating a class
+-   For that we have to define the method / property as **static**
+-   **ATTENTION**: With **static** methods / properties in our class, we cannot access invoke inside other methods in our Class directly. This static method / property is only available outside of the class
+
+    -   static methods/properties are detached from the class, that's why wen can't access using `this` keyword
+    -   To access the static method/property inside of a class method, we have to call the class itself to access the method/property
+        -   `Department.fiscalYear`
+
+    ```TypeScript
+      class Department {
+          static fiscalYear: number = 2020;
+          // public publicProperty: string;
+          // private privateProperty: string;
+          protected employees: string[] = [];
+
+          constructor(private readonly id: string, public name: string) {}
+
+          static createEmployee(name: string) {
+              return {
+                  name,
+              };
+          }
+
+          describe(this: Department) {
+              console.log(`Department: ${this.name} (${this.id})`);
+          }
+
+          addEmployee(employee: string) {
+              this.employees.push(employee);
+          }
+
+          printEmployeeInformation() {
+              console.log(this.employees.length);
+              console.log(this.employees);
+          }
+      }
+
+      const newEmployee = Department.createEmployee('John');
+      console.log(newEmployee, Department.fiscalYear);
+
+      const accounting = new Department('d1', 'Accounting');
+      accounting.addEmployee('Roger');
+      accounting.addEmployee('Thaisa');
+      accounting.name = 'New Accounting';
+    ```
+
+<h4 id='abstract'>Abstract</h4>
+
+-   Abstract classes, are classes that we don't need to define complete structure of a method, but we want to enforce that our subclasses also have the same method but with different implementation
+-   This way we only define the method that we want to enforce as `abstract` and also we need to define our class as `abstract`
+
+    -   for methods, we we are not returning any value, we should assign `void`
+    -   Then all of subclasses will inherit this method, and we will need to create the method to that subclass, otherwise, we'll get an error
+
+    ```TypeScript
+      abstract class Department {
+          static fiscalYear: number = 2020;
+          // public publicProperty: string;
+          // private privateProperty: string;
+          protected employees: string[] = [];
+
+          constructor(protected readonly id: string, public name: string) {}
+
+          static createEmployee(name: string) {
+              return {
+                  name,
+              };
+          }
+
+          // describe(this: Department) {
+          //     console.log(`Department: ${this.name} (${this.id})`);
+          // }
+          abstract describe(this: Department): void;
+
+          addEmployee(employee: string) {
+              this.employees.push(employee);
+          }
+
+          printEmployeeInformation() {
+              console.log(this.employees.length);
+              console.log(this.employees);
+          }
+      }
+
+      class ITDepartment extends Department {
+          admins: string[];
+          constructor(id: string, admins: string[]) {
+              super(id, 'IT');
+              this.admins = admins;
+          }
+
+          describe() {
+              console.log(`IT Department - ID: ${this.id}`);
+          }
+      }
+    ```
+
+<h4 id='singleton'>Private Constructor - Singleton Pattern</h4>
+
+-   Single instance of an object
+-   To create a private constructor, we just need to assign `private` in front of the constructor
+    -   But with that, we no longer can create a new instance of class (`new AccountingDepartment('d4', [])`)
+    -   To have access to the private constructor we have to create a `static` method, this way we don't need to invoke the class, but just the method
+-   Then we need to create a `private static` instance, type **class**, so we can check if there is already an existing class, if yes, we use that one, otherwise, create one
+
+    ```TypeScript
+      class AccountingDepartment extends Department {
+          private lastReport: string;
+          private static instance: AccountingDepartment;
+
+          get mostRecentReport() {
+              if (this.lastReport) return this.lastReport;
+              throw new Error('No report found.');
+          }
+
+          set mostRecentReport(value: string) {
+              if (!value) throw new Error('Please pass a valid value');
+              this.addReport(value);
+          }
+
+          private constructor(id: string, private reports: string[]) {
+              super(id, 'Accounting Reports');
+              this.lastReport = reports[0];
+          }
+
+          static getInstance() {
+              if (this.instance) {
+                  return this.instance;
+              }
+              this.instance = new AccountingDepartment('d4', []);
+              return this.instance;
+          }
+
+          describe() {
+              console.log(`Custom Accounting Department - ID: ${this.id}`);
+          }
+          addEmployee(name: string) {
+              if (name === 'Bob') return;
+              this.employees.push(name);
+          }
+
+          addReport(text: string) {
+              this.reports.push(text);
+              this.lastReport = text;
+          }
+
+          printReports() {
+              console.log(this.reports);
+          }
+      }
+
+      // const accDepartment = new AccountingDepartment('d4', []);
+      const accDepartment = AccountingDepartment.getInstance();
+      const accDepartment2 = AccountingDepartment.getInstance();
+      console.log(accDepartment, accDepartment2);
+      // console.log(accDepartment.mostRecentReport);
+      accDepartment.mostRecentReport = 'Report using setter';
+      accDepartment.name = 'New Accounting Department';
+      accDepartment.describe();
+      accDepartment.addEmployee('Bob');
+      accDepartment.addEmployee('Marley');
+      accDepartment.addReport('Report 1');
+      accDepartment.addReport('Report 2');
+      accDepartment.addReport('Report 3');
+      accDepartment.printReports();
+      accDepartment.printEmployeeInformation();
+      console.log(accDepartment);
+      console.log(accDepartment.mostRecentReport);
     ```

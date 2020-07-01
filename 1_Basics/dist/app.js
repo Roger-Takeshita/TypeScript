@@ -51,4 +51,98 @@ const [sport1, sport2, ...rest] = sports;
 console.log(sport1);
 console.log(sport2);
 console.log(rest);
+console.log('-----------------------Classes');
+class Department {
+    constructor(id, name) {
+        this.id = id;
+        this.name = name;
+        this.employees = [];
+    }
+    static createEmployee(name) {
+        return {
+            name,
+        };
+    }
+    addEmployee(employee) {
+        this.employees.push(employee);
+    }
+    printEmployeeInformation() {
+        console.log(this.employees.length);
+        console.log(this.employees);
+    }
+}
+Department.fiscalYear = 2020;
+const newEmployee = Department.createEmployee('John');
+console.log(newEmployee, Department.fiscalYear);
+class ITDepartment extends Department {
+    constructor(id, admins) {
+        super(id, 'IT');
+        this.admins = admins;
+    }
+    describe() {
+        console.log(`IT Department - ID: ${this.id}`);
+    }
+}
+const it = new ITDepartment('d3', ['Roger']);
+it.addEmployee('Mike');
+it.addEmployee('Joy');
+it.addEmployee('Yumi');
+it.name = 'New IT';
+it.describe();
+it.printEmployeeInformation();
+console.log(it);
+class AccountingDepartment extends Department {
+    constructor(id, reports) {
+        super(id, 'Accounting Reports');
+        this.reports = reports;
+        this.lastReport = reports[0];
+    }
+    get mostRecentReport() {
+        if (this.lastReport)
+            return this.lastReport;
+        throw new Error('No report found.');
+    }
+    set mostRecentReport(value) {
+        if (!value)
+            throw new Error('Please pass a valid value');
+        this.addReport(value);
+    }
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new AccountingDepartment('d4', []);
+        return this.instance;
+    }
+    describe() {
+        console.log(`Custom Accounting Department - ID: ${this.id}`);
+    }
+    addEmployee(name) {
+        if (name === 'Bob')
+            return;
+        this.employees.push(name);
+    }
+    addReport(text) {
+        this.reports.push(text);
+        this.lastReport = text;
+    }
+    printReports() {
+        console.log(this.reports);
+    }
+}
+const accDepartment = AccountingDepartment.getInstance();
+const accDepartment2 = AccountingDepartment.getInstance();
+console.log(accDepartment, accDepartment2);
+accDepartment.mostRecentReport = 'Report using setter';
+accDepartment.name = 'New Accounting Department';
+accDepartment.describe();
+accDepartment.addEmployee('Bob');
+accDepartment.addEmployee('Marley');
+accDepartment.addReport('Report 1');
+accDepartment.addReport('Report 2');
+accDepartment.addReport('Report 3');
+accDepartment.printReports();
+accDepartment.printEmployeeInformation();
+console.log(accDepartment);
+console.log(accDepartment.mostRecentReport);
 //# sourceMappingURL=app.js.map
