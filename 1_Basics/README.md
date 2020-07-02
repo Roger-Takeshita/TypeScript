@@ -32,6 +32,14 @@
             -   [Inheritance](#inheritinterface)
             -   [Function](#interfacefunction)
             -   [Optional](#interfaceoption)
+        -   [Advanced Types](#advancedtypes)
+            -   [Intersection Types](#intersectiontypes)
+            -   [Type Guards](#typeguards)
+            -   [Discriminated Unions](#discriminatedunion)
+            -   [Type Casting](#typecasting)
+            -   [Index Properties](#indexproperties)
+            -   [Optional Chaining](#optionalchaining)
+            -   [Nullish Coalescing](#nullish)
 
 <h1 id='typescript'>TypeScript</h1>
 
@@ -901,4 +909,263 @@
       // user1.name = 'Not Allowed';
       user1.greet('Hi there - I am');
       console.log(user1);
+    ```
+
+<h3 id='advancedtypes'>Advanced Types</h3>
+
+[Go Back to Summary](#summary)
+
+<h4 id='intersectiontypes'>Intersection Types</h4>
+
+-   Intersection types (**&**)
+
+    -   Combine one or more `types`
+
+    ```TypeScript
+      type Admin = {
+          name: string;
+          privileges: string[];
+      };
+
+      type Employee = {
+          name: string;
+          startDate: Date;
+      };
+
+      type ElevatedEmployee = Admin & Employee;
+      type Combinable = string | number;
+      type Numeric = number | boolean;
+      type Universal = Combinable & Numeric;
+
+      //+ New object type ElevatedEmployee
+      const e1: ElevatedEmployee = {
+          name: 'Roger',
+          privileges: ['create-server'],
+          startDate: new Date(),
+      };
+    ```
+
+<h4 id='typeguards'>Type Guards</h4>
+
+```TypeScript
+  type Admin = {
+      name: string;
+      privileges: string[];
+  };
+
+  type Employee = {
+      name: string;
+      startDate: Date;
+  };
+
+  type ElevatedEmployee = Admin & Employee;
+  type Combinable = string | number;
+  type Numeric = number | boolean;
+  type Universal = Combinable & Numeric;
+
+  function add2(a: Combinable, b: Combinable) {
+      if (typeof a === 'string' || typeof b === 'string') {
+          return a.toString() + b.toString();
+      }
+      return a + b;
+  }
+```
+
+-   This is called a **Type Guard**
+
+    -   **Type Guard** is just a term that describes the idea or approach of checking if a certain property or method before using it.
+    -   It allows us to the flexibility that `union type` gives us and still assure that our code run correctly at run time
+
+    ```TypeScript
+      if (typeof a === 'string' || typeof b === 'string') {
+          return a.toString() + b.toString();
+      }
+    ```
+
+-   Checking if a property exist
+
+    ```TypeScript
+      class Car {
+          drive() {
+              console.log('Driving...');
+          }
+      }
+
+      class Truck {
+          drive() {
+              console.log('Driving truck...');
+          }
+
+          loadCargo(amount: number) {
+              console.log(`Loading cargo ${amount}`);
+          }
+      }
+
+      type Vehicle = Car | Truck;
+      const v1 = new Car();
+      const v2 = new Truck();
+
+      function useVehicle(vehicle: Vehicle) {
+          vehicle.drive();
+          if ('loadCargo' in vehicle) {
+              vehicle.loadCargo(1000);
+          }
+      }
+
+      useVehicle(v1);
+      useVehicle(v2);
+    ```
+
+-   Elegant way to check if a property exists
+
+    -   We can use [instanceof](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof) (it's vanilla JS)
+    -   The `instanceof` operator tests whether the `prototype` property of a constructor appears anywhere in the prototype chain of an object
+
+    ```JavaScript
+      function Car(make, model, year) {
+        this.make = make;
+        this.model = model;
+        this.year = year;
+      }
+      const auto = new Car('Honda', 'Accord', 1998);
+
+      console.log(auto instanceof Car);
+      // expected output: true
+
+      console.log(auto instanceof Object);
+      // expected output: true
+    ```
+
+-   For objects we can use `in` or `instanceof`
+-   And for other cases we can use `typeof`
+
+<h4 id='discriminatedunion'>Discriminated Unions</h4>
+
+-   `Discriminated Union` is a pattern which we can use to work with **union types** that makes implementing **type guards** easier
+-   It's available when we are working with object types
+-   The discriminant is a singleton type property which is common in each of the elements of the union (tag).
+
+    ```TypeScript
+      interface Bird {
+          type: 'bird';
+          flyingSpeed: number;
+      }
+
+      interface Horse {
+          type: 'horse';
+          runningSpeed: number;
+      }
+
+      type Animal = Bird | Horse;
+
+      function moveAnimal(animal: Animal) {
+          let speed;
+          switch (animal.type) {
+              case 'bird':
+                  speed = animal.flyingSpeed;
+
+                  break;
+              case 'horse':
+                  speed = animal.runningSpeed;
+
+                  break;
+          }
+
+          console.log(`Moving at speed: ${speed}`);
+      }
+
+      moveAnimal({ type: 'bird', flyingSpeed: 10 });
+      moveAnimal({ type: 'horse', runningSpeed: 30 });
+    ```
+
+<h4 id='typecasting'>Type Casting</h4>
+
+-   **Type Casting** helps you tell TypeScript that some value is of a specific type
+
+    -   **Option 1** - using `<...>` before the element
+    -   **Option 2** define `as` the element type after targeting the element
+
+    ```TypeScript
+      // const userInputEl = <HTMLInputElement>document.getElementById('user-input')!;
+      const userInputEl = document.getElementById('user-input')! as HTMLInputElement;
+      userInputEl.value = 'Hi There!';
+    ```
+
+    -   `!` in the end of the element tells TypeScript that the expression in front of it will never yield `null`
+
+<h4 id='indexproperties'>Index Properties</h4>
+
+-   Works with object, we could define an error container where we define all the possible errors, and using generic key/value pairs to access the information
+
+    -   `[key: string]: string`
+    -   Where the `key` is of type `string`
+    -   and the `value` is of type `string`
+
+    ```TypeScript
+      interface ErrorContainer {
+          [key: string]: string;
+      }
+
+      const errorBag: ErrorContainer = {
+          email: 'Not a valid email!',
+          username: 'Must start with a capital character!',
+      };
+    ```
+
+<h4 id='functionoverloads'>Function Overloads</h4>
+
+-   Function overloads is a feature that allows us define multiple function signatures
+
+    -   Multiple ways to call the function with multiple parameters to do something inside of that function
+
+    ```TypeScript
+      function add2(a: number, b: number): number;
+      function add2(a: string, b: string): string;
+      function add2(a: number, b: string): string;
+      function add2(a: string, b: number): string;
+      function add2(a: Combinable, b: Combinable) {
+          if (typeof a === 'string' || typeof b === 'string') {
+              return a.toString() + b.toString();
+          }
+          return a + b;
+      }
+
+      const result = add2('Roger', ' Takeshita');
+      console.log(result.split(' '));
+      const result1 = add2(1, 3);
+      console.log(result1);
+    ```
+
+<h4 id='optionalchaining'>Optional Chaining</h4>
+
+-   by adding a `?` after the object that we are unsure that exists or not. If the property exist then it will accesses the next property, and so on...
+
+    ```TypeScript
+      const fetchUserData = {
+          id: 'ui',
+          name: 'Max',
+          job: {
+              title: 'CEO',
+              description: 'My own company',
+          },
+      };
+
+      // console.log(fetchUserData.job && fetchUserData.job.title);
+      console.log(fetchUserData?.job?.title);
+    ```
+
+<h4 id='nullish'>Nullish Coalescing</h4>
+
+-   the double `?` checks if the value is really `null` or `undefined` different from normal JS that an empty string is `falsy`
+
+    ```TypeScript
+      const userInput = '';
+      const storedData = userInput || 'DEFAULT';
+      console.log(storedData);
+      // DEFAULT
+
+      const userInput2 = '';
+      const storedData2 = userInput2 ?? 'DEFAULT';
+      console.log(storedData2);
+      //
     ```
