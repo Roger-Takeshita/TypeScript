@@ -28,6 +28,10 @@
             -   [Static Methods / Properties](#static)
             -   [Abstract](#abstract)
             -   [Private Constructor - Singleton Pattern](#singleton)
+        -   [Interface](#interface)
+            -   [Inheritance](#inheritinterface)
+            -   [Function](#interfacefunction)
+            -   [Optional](#interfaceoption)
 
 <h1 id='typescript'>TypeScript</h1>
 
@@ -411,6 +415,7 @@
 
 [Go Back to Summary](#summary)
 
+-   [MDN Official Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes)
 -   **Properties**
     -   **public** properties, where can be accessed anywhere outside of the class
     -   **private** properties, where can be accessed only inside the class, but not from subclasses - inheritance
@@ -721,4 +726,179 @@
       accDepartment.printEmployeeInformation();
       console.log(accDepartment);
       console.log(accDepartment.mostRecentReport);
+    ```
+
+<h3 id='interface'>Interface</h3>
+
+[Go Back to Summary](#summary)
+
+-   [TypeScript Official Docs](https://www.typescriptlang.org/docs/handbook/interfaces.html)
+-   One option of an interface would be a `type` object
+-   We often can use interchangeably `interface` or `type`
+
+    ```TypeScript
+        type Person = {
+            name: string;
+            age: number;
+
+            greet(phrase: string): void;
+        }
+
+        let user1: Person;
+        user1 = {
+            name: 'Roger',
+            age: 33,
+            greet(phrase: string) {
+                console.log(`${phrase} ${this.name}`);
+            }
+        }
+
+        user1.greet('Hi there - I am');
+    ```
+
+-   The difference between an **interface** and **type**:
+
+    -   With interface we can only use to describe the structure of an object. While a `type`, it can be used to store other things like `union types` (multiple types into one type)
+        -   `let text: string | string[];`
+    -   When we define as an **interface**, it's clear that we want to define only the structure of the object, while **type** is not always true
+    -   An **interface** can be implemented inside a **class**
+        -   To do so, we have to `implements`, similar to `extends` but we can assign multiple interfaces
+        -   Then we just need to create the method inside our class, and this method will follow the structure of our interface
+    -   Interfaces are often used to share functionalities among different classes, not concrete about the implementation but regarded to structure / features that a class should have
+    -   Similar to an `abstract class`
+
+-   Not allowed in an **interface**
+
+    -   `public`
+    -   `private`
+    -   `protected`
+
+-   Allowed
+
+    -   `readonly`
+
+    ```TypeScript
+      interface Greetable {
+          readonly name: string;
+
+          greet(phrase: string): void;
+      }
+
+      class Person implements Greetable {
+          name: string;
+          age = 30;
+
+          constructor(n: string) {
+              this.name = n;
+          }
+
+          greet(phrase: string) {
+              console.log(`${phrase} ${this.name}`);
+          }
+      }
+
+      let user1: Greetable;
+
+      user1 = new Person('Roger');
+      user1.name = 'Not Allowed';
+      user1.greet('Hi there - I am');
+      console.log(user1);
+    ```
+
+<h4 id='inheritinterface'>Inheritance</h4>
+
+-   We can combine interfaces with the help of `extends` (just like in a class), the the sub interface will inherit everything from the parent interface
+
+    -   the only difference is that **interfaces** can extend more than one **parent interface** (with classes that's not allowed)
+
+    ```TypeScript
+      interface Named {
+          readonly name: string;
+      }
+
+      interface Greetable extends Named {
+          greet(phrase: string): void;
+      }
+
+      class Person implements Greetable {
+          name: string;
+          age = 30;
+
+          constructor(n: string) {
+              this.name = n;
+          }
+
+          greet(phrase: string) {
+              console.log(`${phrase} ${this.name}`);
+          }
+      }
+
+      let user1: Greetable;
+
+      user1 = new Person('Roger');
+      // user1.name = 'Not Allowed';  <--- will get an error
+      user1.greet('Hi there - I am');
+      console.log(user1);
+    ```
+
+<h4 id='interfacefunction'>Function</h4>
+
+-   Most common way to create a function structure would be using `type`
+    -   `type AddFn = (a: number, b: number) => number;`
+-   An alternative would be to create using function interface, for that we need to an anonymous function
+
+    ```TypeScript
+      // type AddFn = (a: number, b: number) => number;
+      interface AddFn {
+          (a: number, b: number): number;
+      }
+
+      let add1: AddFn;
+      add1 = (n1: number, n2: number) => {
+          return n1 + n2;
+      };
+    ```
+
+<h4 id='interfaceoption'>Optional</h4>
+
+-   Not always we want to enforce the structure of the interface, fot that we can create optional properties by adding a `?` (question mark) after the name of the property
+
+    -   We could also mark methods as optional
+        -   `myMethod?(){...}`
+
+    ```TypeScript
+      interface Named {
+          readonly name?: string;
+          outputName?: string;
+      }
+
+      interface Greetable extends Named {
+          greet(phrase: string): void;
+      }
+
+      class Person implements Greetable {
+          name?: string;
+          age = 30;
+
+          constructor(n?: string) {
+              if (n) {
+                  this.name = n;
+              }
+          }
+
+          greet(phrase: string) {
+              if (this.name) {
+                  console.log(`${phrase} ${this.name}`);
+              } else {
+                  console.log('Hi');
+              }
+          }
+      }
+
+      let user1: Greetable;
+
+      user1 = new Person();
+      // user1.name = 'Not Allowed';
+      user1.greet('Hi there - I am');
+      console.log(user1);
     ```
