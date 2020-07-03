@@ -1,163 +1,162 @@
-//! Option 1 - Using Types
-type Admin = {
-    name: string;
-    privileges: string[];
-};
+//= Generic Type Array of Strings
+// const names = ['Roger', 'Thaisa'];
+const names: Array<string> = []; // equal to string[]
+// names[0].split(' ');
 
-type Employee = {
-    name: string;
-    startDate: Date;
-};
+//= Generic Type Promise - Returning a String
+const promise: Promise<string> = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve('This is done');
+    }, 2000);
+});
+promise.then((data) => {
+    console.log(data.split(' '));
+});
 
-type ElevatedEmployee = Admin & Employee;
-type Combinable = string | number;
-type Numeric = number | boolean;
-type Universal = Combinable & Numeric;
+//= Generic Type Promise - Returning a Number
+const promise2: Promise<number> = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve(10.6);
+    }, 2000);
+});
+promise2.then((data) => {
+    console.log(Math.ceil(data));
+});
 
-function add2(a: number, b: number): number;
-function add2(a: string, b: string): string;
-function add2(a: number, b: string): string;
-function add2(a: string, b: number): string;
-function add2(a: Combinable, b: Combinable) {
-    if (typeof a === 'string' || typeof b === 'string') {
-        return a.toString() + b.toString();
-    }
-    return a + b;
+//= Generic Function
+function merge(objA: object, objB: object) {
+    return Object.assign(objA, objB);
 }
 
-const result = add2('Roger', ' Takeshita');
-console.log(result.split(' '));
-const result1 = add2(1, 3);
-console.log(result1);
+console.log(merge({ name: 'Roger' }, { age: 33 }));
 
-type UnknownEmployee = Employee | Admin;
+const mergedObj = merge({ name: 'Roger' }, { age: 33 });
+console.log(mergedObj);
+// {name: "Roger", age: 33}
+// console.log(mergedObj.name); // this won't work, because TypeScript doesn't know this
 
-function printEmployeeInformation(emp: UnknownEmployee) {
-    console.log(`Name ${emp.name}`);
+//+ One alternative is to use type casting
+const mergedObjAlternative1 = merge({ name: 'Roger' }, { age: 33 }) as {
+    name: string;
+    age: number;
+};
+console.log(mergedObjAlternative1.name);
 
-    if ('privileges' in emp) {
-        console.log(`Privileges: ${emp.privileges}`);
-    }
-    if ('startDate' in emp) {
-        console.log(`Start Date: ${emp.startDate}`);
-    }
+//+ A better approach is to use generics to user generic objects
+function merge2<T, U>(objA: T, objB: U) {
+    return Object.assign(objA, objB);
 }
 
-//! Option 2 - Using Interfaces
-// interface Admin {
-//     name: string;
-//     privileges: string[];
+const mergedObjAlternative2 = merge2({ name: 'Roger' }, { age: 33 });
+console.log(mergedObjAlternative2.name);
+
+//_ Another Generic Function
+
+interface Lengthy {
+    length: number;
+}
+
+function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+    let descriptionText = 'Got no Value';
+
+    if (element.length === 1) {
+        descriptionText = 'Got 1 element';
+    } else if (element.length > 0) {
+        descriptionText = `Got ${element.length} elements`;
+    }
+
+    return [element, descriptionText];
+}
+
+console.log(countAndDescribe('Hi there!'));
+console.log(countAndDescribe(['Sports', 'Cooking']));
+console.log(countAndDescribe([]));
+
+//= Constraints
+//+ JavaScript won't throw an error, and our object doesn't have a property 33
+//- Currently we are saying that T and U should be any type
+// function merge3<T, U>(objA: T, objB: U) {
+//     return Object.assign(objA, objB);
 // }
 
-// interface Employee {
-//     name: string;
-//     startDate: Date;
+//+ Generic Type Constraints
+//- We add extends after the object that we want to constraints
+//- We can set any type of constraints, custom type, union types...
+function merge3<T extends object, U extends object>(objA: T, objB: U) {
+    return Object.assign(objA, objB);
+}
+
+const mergedObjAlternative3 = merge3({ name: 'Roger' }, { age: 33 });
+console.log(mergedObjAlternative3.name);
+console.log(mergedObjAlternative3);
+
+//= The "keyof" Constraint
+
+// function extractAndConvert<T extends object, U>(obj: object, key: string) {
+//     return `Value: ${obj[key]}`;
 // }
 
-// interface ElevatedEmployee extends Admin, Employee {}
+// console.log(extractAndConvert({}, 'name'));
 
-//+ New object type ElevatedEmployee
-const e1: ElevatedEmployee = {
-    name: 'Roger',
-    privileges: ['create-server'],
-    startDate: new Date(),
-};
+class DataStorage<T extends string | number | boolean> {
+    private data: T[] = [];
 
-printEmployeeInformation(e1);
-printEmployeeInformation({ name: 'Thaisa', startDate: new Date() });
+    addItem(item: T) {
+        this.data.push(item);
+    }
 
-class Car {
-    drive() {
-        console.log('Driving...');
+    removeItem(item: T) {
+        this.data.splice(this.data.indexOf(item), 1);
+    }
+
+    getItems() {
+        return [...this.data];
     }
 }
 
-class Truck {
-    drive() {
-        console.log('Driving truck...');
-    }
+const textStorage = new DataStorage<string>();
+textStorage.addItem('Roger');
+textStorage.addItem('Thaisa');
+textStorage.removeItem('Roger');
+console.log(textStorage.getItems());
 
-    loadCargo(amount: number) {
-        console.log(`Loading cargo ${amount}`);
-    }
+const numberStorage = new DataStorage<number>();
+numberStorage.addItem(1);
+numberStorage.addItem(2);
+numberStorage.addItem(3);
+console.log(numberStorage.getItems());
+
+//+ To work with object, it's not that simple, because with object the only way to remove an object, it's by accessing the pointer of that object
+//+ because the structure of the object might be the same, but in memory they are totally different pointes, that's why we can't simply removeItem({name: 'Roger'})
+//- One work around is to define the object as a constant, and then when we want to delete this object, we reference the same constant.
+//- Beside that, we can constraint our class to only extends to stings, numbers and booleans
+// const objStorage = new DataStorage<object>();
+// const rogerObj = { name: 'Roger' };
+// objStorage.addItem(rogerObj);
+// objStorage.addItem({ name: 'Thaisa' });
+// objStorage.removeItem(rogerObj);
+// console.log(objStorage.getItems());
+
+//= Generic Utility Types
+
+//_ Partials
+interface CourseGoal {
+    title: string;
+    description: string;
+    completeUntil: Date;
 }
 
-type Vehicle = Car | Truck;
-const v1 = new Car();
-const v2 = new Truck();
+function createCourseGoal(title: string, description: string, date: Date) {
+    let courseGoal: Partial<CourseGoal> = {};
 
-function useVehicle(vehicle: Vehicle) {
-    vehicle.drive();
-    if (vehicle instanceof Truck) {
-        vehicle.loadCargo(1000);
-    }
+    courseGoal.title = title;
+    courseGoal.description = description;
+    courseGoal.completeUntil = date;
+
+    return courseGoal as CourseGoal;
 }
 
-useVehicle(v1);
-useVehicle(v2);
-
-interface Bird {
-    type: 'bird';
-    flyingSpeed: number;
-}
-
-interface Horse {
-    type: 'horse';
-    runningSpeed: number;
-}
-
-type Animal = Bird | Horse;
-
-function moveAnimal(animal: Animal) {
-    let speed;
-    switch (animal.type) {
-        case 'bird':
-            speed = animal.flyingSpeed;
-
-            break;
-        case 'horse':
-            speed = animal.runningSpeed;
-
-            break;
-    }
-
-    console.log(`Moving at speed: ${speed}`);
-}
-
-moveAnimal({ type: 'bird', flyingSpeed: 10 });
-moveAnimal({ type: 'horse', runningSpeed: 30 });
-
-// const userInputEl = <HTMLInputElement>document.getElementById('user-input')!;
-const userInputEl = document.getElementById('user-input')! as HTMLInputElement;
-userInputEl.value = 'Hi There!';
-
-interface ErrorContainer {
-    [key: string]: string;
-}
-
-const errorBag: ErrorContainer = {
-    email: 'Not a valid email!',
-    username: 'Must start with a capital character!',
-};
-
-const fetchUserData = {
-    id: 'ui',
-    name: 'Max',
-    job: {
-        title: 'CEO',
-        description: 'My own company',
-    },
-};
-
-// console.log(fetchUserData.job && fetchUserData.job.title);
-console.log(fetchUserData?.job?.title);
-
-//! nullish coalescing
-//+ Normal js
-const userInput = '';
-const storedData = userInput || 'DEFAULT';
-console.log(storedData);
-
-const userInput2 = '';
-const storedData2 = userInput2 ?? 'DEFAULT';
-console.log(storedData2);
+//_ Readonly
+const names2: Readonly<string[]> = ['Roger', 'Thaisa'];
+// names2.push('Yumi');
+// names2.pop();

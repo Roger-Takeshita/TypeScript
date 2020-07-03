@@ -40,6 +40,13 @@
             -   [Index Properties](#indexproperties)
             -   [Optional Chaining](#optionalchaining)
             -   [Nullish Coalescing](#nullish)
+        -   [Generics](#generics)
+            -   [Generic Type](#generictype)
+            -   [Generic Function](#genericfunction)
+            -   [Constraints](#constraints)
+            -   [Another Generic Function](#anothergenericfunction)
+            -   [The "keyof" Constraint](#keyofconstraint)
+            -   [Generic Utility Type](#utilitytype)
 
 <h1 id='typescript'>TypeScript</h1>
 
@@ -243,7 +250,7 @@
 
           /* Additional Checks */
           "noUnusedLocals": true,                   /* Report errors on unused locals. */
-          "noUnusedParameters": true,               /* Report errors on unused parameters. */
+          "noUnusedParameters": false,              /* Report errors on unused parameters. */
           "noImplicitReturns": true,                /* Report error when not all code paths in function return a value. */
           "noFallthroughCasesInSwitch": true,       /* Report errors for fallthrough cases in switch statement. */
 
@@ -1168,4 +1175,212 @@
       const storedData2 = userInput2 ?? 'DEFAULT';
       console.log(storedData2);
       //
+    ```
+
+<h3 id='generics'>Generics</h3>
+
+[Go Back to Summary](#summary)
+
+<h4 id='generictype'>Generic Type</h4>
+
+-   Generic type `Array<type_here>`
+
+    ```TypeScript
+      //! Generic Type Array of Strings
+      // const names = ['Roger', 'Thaisa'];
+      const names: Array<string> = []; // equal to string[]
+      // names[0].split(' ');
+
+      //! Generic Type Promise - Returning a String
+      const promise: Promise<string> = new Promise((resolve, reject) => {
+          setTimeout(() => {
+              resolve('This is done');
+          }, 2000);
+      });
+      promise.then((data) => {
+          console.log(data.split(' '));
+      });
+
+      //! Generic Type Promise - Returning a Number
+      const promise2: Promise<number> = new Promise((resolve, reject) => {
+          setTimeout(() => {
+              resolve(10.6);
+          }, 2000);
+      });
+      promise2.then((data) => {
+          console.log(Math.ceil(data));
+      });
+    ```
+
+<h4 id='genericfunction'>Generic Function</h4>
+
+```TypeScript
+  function merge(objA: object, objB: object) {
+      return Object.assign(objA, objB);
+  }
+
+  console.log(merge({ name: 'Roger' }, { age: 33 }));
+
+  const mergedObj = merge({ name: 'Roger' }, { age: 33 });
+  console.log(mergedObj);
+  // {name: "Roger", age: 33}
+  // console.log(mergedObj.name); // this won't work, because TypeScript doesn't know this
+
+  //+ One alternative is to use type casting
+  const mergedObjAlternative1 = merge({ name: 'Roger' }, { age: 33 }) as {
+      name: string;
+      age: number;
+  };
+  console.log(mergedObjAlternative1.name);
+
+  //+ A better approach is to use generics to user generic objects
+  function merge2<T, U>(objA: T, objB: U) {
+      return Object.assign(objA, objB);
+  }
+
+  const mergedObjAlternative2 = merge2({ name: 'Roger' }, { age: 33 });
+  console.log(mergedObjAlternative2.name);
+```
+
+<h4 id='constraints'>Constraints</h4>
+
+-   The following code JavaScript fails silently, JavaScript won't throw an error, and our object doesn't have a property `33`
+-   Currently we are saying that `T` and `U` should be **any type**
+
+    ```TypeScript
+      function merge3<T, U>(objA: T, objB: U) {
+          return Object.assign(objA, objB);
+      }
+
+      const mergedObjAlternative3 = merge3({ name: 'Roger' }, 33);
+      console.log(mergedObjAlternative3.age);
+
+      // TypeScript will throw an error
+    ```
+
+-   Generic Type Constraints
+
+    -   We add extends after the object that we want to constraints
+    -   We can set any type of constraints, custom type, union types...
+
+    ```TypeScript
+      function merge3<T extends object, U extends object>(objA: T, objB: U) {
+        return Object.assign(objA, objB);
+      }
+
+      const mergedObjAlternative3 = merge3({ name: 'Roger' }, { age: 33 });
+      console.log(mergedObjAlternative3.name);
+      console.log(mergedObjAlternative3);
+    ```
+
+<h4 id='anothergenericfunction'>Another Generic Function</h4>
+
+-   we can create a custom `interface` and then **extends** our generic function, then explicit indicate that our function will return a **tuple** where the first position is of `type any` (not a number type), and the second position will be a `type string`.
+
+    ```TypeScript
+      interface Lengthy {
+          length: number;
+      }
+
+      function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+          let descriptionText = 'Got no Value';
+
+          if (element.length === 1) {
+              descriptionText = 'Got 1 element';
+          } else if (element.length > 0) {
+              descriptionText = `Got ${element.length} elements`;
+          }
+
+          return [element, descriptionText];
+      }
+
+      console.log(countAndDescribe('Hi there!'));
+      console.log(countAndDescribe(['Sports', 'Cooking']));
+      console.log(countAndDescribe([]));
+    ```
+
+<h4 id='keyofconstraint'>The "keyof" Constraint</h4>
+
+-   We can use the `keyof` constraint to extend certain types to the class to be more specific (instead of `type any`)
+
+    ```TypeScript
+      class DataStorage<T extends string | number | boolean> {
+          private data: T[] = [];
+
+          addItem(item: T) {
+              this.data.push(item);
+          }
+
+          removeItem(item: T) {
+              this.data.splice(this.data.indexOf(item), 1);
+          }
+
+          getItems() {
+              return [...this.data];
+          }
+
+      }
+
+      const textStorage = new DataStorage<string>();
+      textStorage.addItem('Roger');
+      textStorage.addItem('Thaisa');
+      textStorage.removeItem('Roger');
+      console.log(textStorage.getItems());
+
+      const numberStorage = new DataStorage<number>();
+      numberStorage.addItem(1);
+      numberStorage.addItem(2);
+      numberStorage.addItem(3);
+      console.log(numberStorage.getItems());
+    ```
+
+-   To work with object, it's not that simple, because with objects, the only way to remove an object, it's by accessing the pointer of that object
+-   Just because the structure of an object might be the same, this doesn't mean that the pointer in memory are the same, that's why we can't simply removeItem({name: 'Roger'})
+-   One work around is to define the object as a constant, and then when we want to delete this object, we reference the same constant.
+-   Beside that, we can constraint our class to only extends to `stings`, `numbers` and `booleans`
+
+    ```TypeScript
+      const objStorage = new DataStorage<object>();
+      const rogerObj = { name: 'Roger' };
+
+      objStorage.addItem(rogerObj);
+      objStorage.addItem({ name: 'Thaisa' });
+      objStorage.removeItem(rogerObj);
+      console.log(objStorage.getItems());
+    ```
+
+<h4 id='utilitytype'>Generic Utility Type</h4>
+
+-   [TypeScript Official Docs](https://www.typescriptlang.org/docs/handbook/utility-types.html)
+
+-   **Partials**
+
+    -   **Partial** is another type of property where it assigns everything as optional, this way when we have an empty array but we want to assign an interface so we can use this object later.
+    -   We can assign as **Partial** with the type `<CourseGoal>`
+    -   And then, before we return the new object, we convert it as a CourseGoal object, because so far we have a as a Partial object and not as CourseGoal object
+
+        ```TypeScript
+          interface CourseGoal {
+              title: string;
+              description: string;
+              completeUntil: Date;
+          }
+
+          function createCourseGoal(title: string, description: string, date: Date) {
+              let courseGoal: Partial<CourseGoal> = {};
+
+              courseGoal.title = title;
+              courseGoal.description = description;
+              courseGoal.completeUntil = date;
+
+              return courseGoal as CourseGoal;
+          }
+        ```
+
+-   **Readonly**
+
+    ```TypeScript
+      const names2: Readonly<string[]> = ['Roger', 'Thaisa'];
+      names2.push('Yumi'); // <---- It will throw an error
+      names2.pop();        // <---- It will throw an error
     ```

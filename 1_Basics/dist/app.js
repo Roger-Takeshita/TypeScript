@@ -1,87 +1,83 @@
 "use strict";
-var _a;
-function add2(a, b) {
-    if (typeof a === 'string' || typeof b === 'string') {
-        return a.toString() + b.toString();
-    }
-    return a + b;
+const names = [];
+const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve('This is done');
+    }, 2000);
+});
+promise.then((data) => {
+    console.log(data.split(' '));
+});
+const promise2 = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve(10.6);
+    }, 2000);
+});
+promise2.then((data) => {
+    console.log(Math.ceil(data));
+});
+function merge(objA, objB) {
+    return Object.assign(objA, objB);
 }
-const result = add2('Roger', ' Takeshita');
-console.log(result.split(' '));
-const result1 = add2(1, 3);
-console.log(result1);
-function printEmployeeInformation(emp) {
-    console.log(`Name ${emp.name}`);
-    if ('privileges' in emp) {
-        console.log(`Privileges: ${emp.privileges}`);
+console.log(merge({ name: 'Roger' }, { age: 33 }));
+const mergedObj = merge({ name: 'Roger' }, { age: 33 });
+console.log(mergedObj);
+const mergedObjAlternative1 = merge({ name: 'Roger' }, { age: 33 });
+console.log(mergedObjAlternative1.name);
+function merge2(objA, objB) {
+    return Object.assign(objA, objB);
+}
+const mergedObjAlternative2 = merge2({ name: 'Roger' }, { age: 33 });
+console.log(mergedObjAlternative2.name);
+function countAndDescribe(element) {
+    let descriptionText = 'Got no Value';
+    if (element.length === 1) {
+        descriptionText = 'Got 1 element';
     }
-    if ('startDate' in emp) {
-        console.log(`Start Date: ${emp.startDate}`);
+    else if (element.length > 0) {
+        descriptionText = `Got ${element.length} elements`;
+    }
+    return [element, descriptionText];
+}
+console.log(countAndDescribe('Hi there!'));
+console.log(countAndDescribe(['Sports', 'Cooking']));
+console.log(countAndDescribe([]));
+function merge3(objA, objB) {
+    return Object.assign(objA, objB);
+}
+const mergedObjAlternative3 = merge3({ name: 'Roger' }, { age: 33 });
+console.log(mergedObjAlternative3.name);
+console.log(mergedObjAlternative3);
+class DataStorage {
+    constructor() {
+        this.data = [];
+    }
+    addItem(item) {
+        this.data.push(item);
+    }
+    removeItem(item) {
+        this.data.splice(this.data.indexOf(item), 1);
+    }
+    getItems() {
+        return [...this.data];
     }
 }
-const e1 = {
-    name: 'Roger',
-    privileges: ['create-server'],
-    startDate: new Date(),
-};
-printEmployeeInformation(e1);
-printEmployeeInformation({ name: 'Thaisa', startDate: new Date() });
-class Car {
-    drive() {
-        console.log('Driving...');
-    }
+const textStorage = new DataStorage();
+textStorage.addItem('Roger');
+textStorage.addItem('Thaisa');
+textStorage.removeItem('Roger');
+console.log(textStorage.getItems());
+const numberStorage = new DataStorage();
+numberStorage.addItem(1);
+numberStorage.addItem(2);
+numberStorage.addItem(3);
+console.log(numberStorage.getItems());
+function createCourseGoal(title, description, date) {
+    let courseGoal = {};
+    courseGoal.title = title;
+    courseGoal.description = description;
+    courseGoal.completeUntil = date;
+    return courseGoal;
 }
-class Truck {
-    drive() {
-        console.log('Driving truck...');
-    }
-    loadCargo(amount) {
-        console.log(`Loading cargo ${amount}`);
-    }
-}
-const v1 = new Car();
-const v2 = new Truck();
-function useVehicle(vehicle) {
-    vehicle.drive();
-    if (vehicle instanceof Truck) {
-        vehicle.loadCargo(1000);
-    }
-}
-useVehicle(v1);
-useVehicle(v2);
-function moveAnimal(animal) {
-    let speed;
-    switch (animal.type) {
-        case 'bird':
-            speed = animal.flyingSpeed;
-            break;
-        case 'horse':
-            speed = animal.runningSpeed;
-            break;
-    }
-    console.log(`Moving at speed: ${speed}`);
-}
-moveAnimal({ type: 'bird', flyingSpeed: 10 });
-moveAnimal({ type: 'horse', runningSpeed: 30 });
-const userInputEl = document.getElementById('user-input');
-userInputEl.value = 'Hi There!';
-const errorBag = {
-    email: 'Not a valid email!',
-    username: 'Must start with a capital character!',
-};
-const fetchUserData = {
-    id: 'ui',
-    name: 'Max',
-    job: {
-        title: 'CEO',
-        description: 'My own company',
-    },
-};
-console.log((_a = fetchUserData === null || fetchUserData === void 0 ? void 0 : fetchUserData.job) === null || _a === void 0 ? void 0 : _a.title);
-const userInput = '';
-const storedData = userInput || 'DEFAULT';
-console.log(storedData);
-const userInput2 = '';
-const storedData2 = userInput2 !== null && userInput2 !== void 0 ? userInput2 : 'DEFAULT';
-console.log(storedData2);
+const names2 = ['Roger', 'Thaisa'];
 //# sourceMappingURL=app.js.map
