@@ -1,0 +1,15 @@
+{
+  "name": "3_drag_and_drop_project",
+  "version": "1.0.0",
+  "description": "TypeScript Drag and Drop Project",
+  "main": "app.js",
+  "scripts": {
+    "start": "lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Roger Takeshita",
+  "license": "ISC",
+  "dependencies": {
+    "lite-server": "^2.5.4"
+  }
+}
