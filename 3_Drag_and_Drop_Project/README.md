@@ -5,6 +5,7 @@
     -   [Interacting with DOM Elements](#interacting)
     -   [Auto Bind Decorator](#autobind)
     -   [Validation](#validation1)
+    -   [Singleton Pattern](#singletonpattern)
 
 -   [Drag and Drop Project](#dragandrop)
     -   [Interacting with DOM Elements](#interacting)
@@ -218,4 +219,62 @@
               this.clearInputs();
           }
       }
+    ```
+
+<h2 id='singletonpattern'>Singleton Pattern</h2>
+
+[Go Back to Summary](#summary)
+
+-   To build a storage like Redux, we can use the singleton pattern to create a single source of truth.
+
+1. Create private variables with their respective type and initial value.
+2. Single instance of an object
+
+    - To create a private constructor, we just need to assign private in front of the constructor
+    - But with that, we no longer can create a new instance of the class (`new className()`)
+    - To have access to the private constructor we have to create a **static** method, this way we don't need to invoke the class, but just the method
+
+        - **ATTENTION**: With static methods / properties in our class, we cannot be accessed directly inside other methods in our Class. This static method / property is only available outside of the class
+        - Static methods/properties are detached from the class, that's why wen can't access using **this** keyword
+        - To access the static method/property inside of a class method, we have to call the class itself to access the method/property
+
+    - Then we need to create a private static instance, type **class**, so we can check if there is already an existing **class**, if yes, we use that one, otherwise, create one
+
+    ```TypeScript
+      class ProjectState {
+          private listeners: any[] = [];
+          private projects: any[] = [];
+          private static instance: ProjectState;
+
+          private constructor() {}
+
+          static getInstance() {
+              if (this.instance) {
+                  return this.instance;
+              }
+
+              this.instance = new ProjectState();
+              return this.instance;
+          }
+
+          addListener(listenerFn: Function) {
+              this.listeners.push(listenerFn);
+          }
+
+          addProject(title: string, description: string, numOfPeople: number) {
+              const newProject = {
+                  id: Math.random().toString(),
+                  title,
+                  description,
+                  people: numOfPeople,
+              };
+
+              this.projects.push(newProject);
+              for (const listenerFn of this.listeners) {
+                  listenerFn(this.projects.slice());
+              }
+          }
+      }
+
+      const projectState = ProjectState.getInstance();
     ```
