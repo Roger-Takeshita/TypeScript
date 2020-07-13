@@ -10,10 +10,17 @@
   "author": "Roger Takeshita",
   "license": "ISC",
   "devDependencies": {
+    "@types/lodash": "^4.14.157",
     "ts-loader": "^8.0.0",
     "typescript": "^3.9.6",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "class-transformer": "^0.2.3",
+    "class-validator": "^0.12.2",
+    "lodash": "^4.17.19",
+    "reflect-metadata": "^0.1.13"
   }
 }
