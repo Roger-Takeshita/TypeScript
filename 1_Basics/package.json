@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "lite-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "npx npm-force-resolutions"
   },
   "repository": {
     "type": "git",
@@ -16,9 +17,16 @@
   "bugs": {
     "url": "https://github.com/Roger-Takeshita/TypeScript/issues"
   },
-  
   "homepage": "https://github.com/Roger-Takeshita/TypeScript#readme",
+  "resolutions": {
+    "minimist": "^1.2.5"
+  },
   "dependencies": {
-    "lite-server": "^2.5.4"
+    "lite-server": "^2.5.4",
+    "lodash": "^4.17.19",
+    "npm-force-resolutions": "0.0.3"
+  },
+  "devDependencies": {
+    "minimist": "^1.2.5"
   }
 }
