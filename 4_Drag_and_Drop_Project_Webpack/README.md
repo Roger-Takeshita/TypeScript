@@ -7,8 +7,8 @@
         -   [tsconfig.json](#tsconfig)
         -   [webpack.config.js - Development](#webpackconfig)
             -   [Build Webpack - Development](#developmentbuild)
-        -   [webpack.config.prod.js - Production](#xxxxxxx)
-            -   [Build Webpack - Production](#xxxxxxx)
+        -   [webpack.config.prod.js - Production](#productionwebpack)
+            -   [Build Webpack - Production](#productionbuild)
 
 <h1 id='webpack'>Webpack With TypeScript</h1>
 
