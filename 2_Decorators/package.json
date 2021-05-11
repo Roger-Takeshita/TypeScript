@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "lite-server": "^2.5.4",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "npm-force-resolutions": "0.0.3"
   },
   "devDependencies": {
