@@ -27,6 +27,6 @@
     "npm-force-resolutions": "0.0.3"
   },
   "devDependencies": {
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.6"
   }
 }
